@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>幸运抽奖系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .input-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"] {
+            min-width: 150px;
+        }
+
+        .weight-input {
+            width: 80px;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #4c6ef5;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.1);
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0 10px;
+        }
+
+        .checkbox-wrapper label {
+            user-select: none;
+            cursor: pointer;
+        }
+
+        button {
+            background: #4c6ef5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: #364fc7;
+            transform: translateY(-1px);
+        }
+
+        button.delete-btn {
+            background: #ff6b6b;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        button.delete-btn:hover {
+            background: #fa5252;
+        }
+
+        button.stop-btn {
+            background: #ff6b6b;
+            margin-left: 10px;
+        }
+
+        button.stop-btn:hover {
+            background: #fa5252;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .winner {
+            background: #d3f9d8 !important;
+            transition: background-color 0.3s ease;
+        }
+
+        #result {
+            text-align: center;
+            font-size: 24px;
+            color: #4c6ef5;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #edf2ff;
+        }
+
+        .lottery-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            border-radius: 20px;
+        }
+
+        .rolling-name {
+            font-size: 64px;
+            color: #fff;
+            text-shadow: 0 0 20px #4c6ef5;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        @keyframes flash {
+            0% { opacity: 0.4; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 0.4; transform: scale(0.95); }
+        }
+
+        .rolling-name.flash {
+            animation: flash 0.8s infinite;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #lotteryControls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            input[type="text"],
+            input[type="number"] {
+                width: 100%;
+            }
+
+            .rolling-name {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ 幸运抽奖系统 ✨</h1>
+        
+        <div class="input-section">
+            <h3>📝 添加参与者</h3>
+            <div class="input-group">
+                <input type="text" id="name" placeholder="请输入姓名">
+                <input type="number" id="weight" value="1" min="1" class="weight-input hidden" placeholder="权重">
+                <div class="checkbox-wrapper force-win-option hidden">
+                    <input type="checkbox" id="forceWin">
+                    <label for="forceWin">必中</label>
+                </div>
+                <button onclick="addParticipant()">添加参与者</button>
+                <div id="lotteryControls" class="hidden">
+                    <input type="number" id="prizeCount" placeholder="请输入中奖名额数" min="1" value="1">
+                </div>
+                <button onclick="startLottery()">🎲 开始抽奖</button>
+                <button onclick="stopLottery()" class="stop-btn" id="stopBtn">⏹️ 停止</button>
+            </div>
+        </div>
+
+        <div class="participant-list">
+            <h3>👥 参与者名单</h3>
+            <table id="participantTable">
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th class="weight-column hidden">权重</th>
+                        <th class="force-win-column hidden">必中</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let participants = [];
+        let showWeight = false;
+        let showForceWin = false;
+        let showLotteryControls = false;
+        let isLotteryRunning = false;
+        let shouldStopLottery = false;
+
+        console.log('可用控制台命令：');
+        console.log('toggleWeight() - 切换权重显示');
+        console.log('toggleForceWin() - 切换必中选项显示');
+        console.log('toggleLotteryControls() - 切换抽奖控制显示');
+
+        function stopLottery() {
+            shouldStopLottery = true;
+        }
+
+        function toggleLotteryControls() {
+            showLotteryControls = !showLotteryControls;
+            document.getElementById('lotteryControls').classList.toggle('hidden');
+            console.log(`抽奖控制显示已${showLotteryControls ? '开启' : '关闭'}`);
+        }
+
+        function toggleWeight() {
+            showWeight = !showWeight;
+            document.querySelectorAll('.weight-input, .weight-column').forEach(el => {
+                el.classList.toggle('hidden');
+            });
+            updateParticipantTable();
+            console.log(`权重显示已${showWeight ? '开启' : '关闭'}`);
+        }
+
+        function toggleForceWin() {
+            showForceWin = !showForceWin;
+            document.querySelectorAll('.force-win-option, .force-win-column').forEach(el => {
+                el.classList.toggle('hidden');
+            });
+            updateParticipantTable();
+            console.log(`必中选项显示已${showForceWin ? '开启' : '关闭'}`);
+        }
+
+        function addParticipant() {
+            const name = document.getElementById('name').value.trim();
+            const weight = showWeight ? (parseInt(document.getElementById('weight').value) || 1) : 1;
+            const forceWin = showForceWin ? document.getElementById('forceWin').checked : false;
+
+            if (!name) {
+                alert('请输入姓名！');
+                return;
+            }
+
+            if (participants.some(p => p.name === name)) {
+                alert('该参与者已存在！');
+                return;
+            }
+
+            participants.push({ name, weight, forceWin, isWinner: false });
+            updateParticipantTable();
+            clearInputs();
+        }
+
+        function clearInputs() {
+            document.getElementById('name').value = '';
+            if (showWeight) document.getElementById('weight').value = '1';
+            if (showForceWin) document.getElementById('forceWin').checked = false;
+        }
+
+        function removeParticipant(index) {
+            participants.splice(index, 1);
+            updateParticipantTable();
+        }
+
+        function updateParticipantTable() {
+            const tbody = document.querySelector('#participantTable tbody');
+            tbody.innerHTML = '';
+
+            participants.forEach((participant, index) => {
+                const tr = document.createElement('tr');
+                if (participant.isWinner) {
+                    tr.classList.add('winner');
+                }
+                
+                let html = `<td>${participant.name}${participant.isWinner ? ' (已中奖)' : ''}</td>`;
+                
+                if (showWeight) {
+                    html += `<td>${participant.weight}</td>`;
+                }
+                
+                if (showForceWin) {
+                    html += `<td>${participant.forceWin ? '是' : '否'}</td>`;
+                }
+                
+                html += `<td><button class="delete-btn" onclick="removeParticipant(${index})">删除</button></td>`;
+                
+                tr.innerHTML = html;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function startLottery() {
+            if (isLotteryRunning) return;
+            isLotteryRunning = true;
+            shouldStopLottery = false;
+            
+            const availableParticipants = participants.filter(p => !p.isWinner);
+            
+            if (availableParticipants.length === 0) {
+                alert('没有可参与抽奖的人员！');
+                isLotteryRunning = false;
+                return;
+            }
+
+            try {
+                let winners = [];
+                const animationContainer = document.createElement('div');
+                animationContainer.className = 'lottery-animation';
+                document.body.appendChild(animationContainer);
+
+                const winner = await animateLotteryDraw(
+                    availableParticipants,
+                    animationContainer
+                );
+                
+                if (winner) {
+                    winners.push(winner);
+                    const participant = participants.find(p => p.name === winner.name);
+                    if (participant) {
+                        participant.isWinner = true;
+                    }
+                }
+
+                document.body.removeChild(animationContainer);
+                
+                if (winners.length > 0) {
+                    document.getElementById('result').innerHTML = 
+                        `🎉 恭喜中奖者：${winners.map(w => w.name).join('、')}`;
+                    updateParticipantTable();
+                }
+            } catch (error) {
+                console.error('抽奖过程出错:', error);
+            } finally {
+                isLotteryRunning = false;
+            }
+        }
+
+        function animateLotteryDraw(pool, container) {
+            return new Promise(resolve => {
+                const rollingElement = document.createElement('div');
+                rollingElement.className = 'rolling-name flash';
+                container.appendChild(rollingElement);
+
+                const availablePool = pool.filter(p => !p.isWinner);
+                
+                let weightPool = [];
+                availablePool.forEach(participant => {
+                    for (let i = 0; i < participant.weight; i++) {
+                        weightPool.push(participant);
+                    }
+                });
+
+                if (weightPool.length === 0) {
+                    container.removeChild(rollingElement);
+                    resolve(null);
+                    return;
+                }
+
+                const animate = () => {
+                    const randomIndex = Math.floor(Math.random() * weightPool.length);
+                    rollingElement.textContent = weightPool[randomIndex].name;
+
+                    if (!shouldStopLottery) {
+                        setTimeout(animate, 50);
+                    } else {
+                        const winner = weightPool[randomIndex];
+                        rollingElement.textContent = winner.name;
+                        rollingElement.classList.remove('flash');
+                        
+                        setTimeout(() => {
+                            container.removeChild(rollingElement);
+                            resolve(winner);
+                        }, 1000);
+                    }
+                };
+
+                animate();
+            });
+        }
+    </script>
+</body>
+</html>
