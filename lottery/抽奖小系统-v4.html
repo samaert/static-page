@@ -589,6 +589,25 @@
             isMusicPlaying = !isMusicPlaying;
         }
 
+        // 文本框添加回车事件监听
+        document.getElementById('name').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // 防止表单提交
+                addParticipant(); // 调用添加参与者函数
+            }
+        });
+
+        // 修改标题的函数
+        function changeTitle(newTitle) {
+            document.title = newTitle;
+            console.log(`标题已更改为: ${newTitle}`);
+        }
+
+        // 在控制台输入命令
+        console.log('可用控制台命令：');
+        console.log('changeTitle("新标题") - 修改网页标题');
+
+
     </script>
 </body>
 </html>
