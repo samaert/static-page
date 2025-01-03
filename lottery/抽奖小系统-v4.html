@@ -597,15 +597,19 @@
             }
         });
 
-        // 修改标题的函数
-        function changeTitle(newTitle) {
+        // 修改标题的函数和h1内容
+        // 修改标题和h1内容的函数
+        function changeTitle(newTitle, newH1) {
             document.title = newTitle;
+            document.querySelector('h1').textContent = newH1;
             console.log(`标题已更改为: ${newTitle}`);
+            console.log(`H1内容已更改为: ${newH1}`);
         }
 
         // 在控制台输入命令
         console.log('可用控制台命令：');
-        console.log('changeTitle("新标题") - 修改网页标题');
+        console.log('changeTitle("新标题", "新H1内容") - 修改网页标题和H1内容');
+
 
 
     </script>
